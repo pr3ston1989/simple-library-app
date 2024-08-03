@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <h1>My books from 2024:</h1>
+  <div class="grid-container" id="grid">
+
+  </div>
+  <div class="new-book">
+    <button type="button" id="add">Want to add another book?</button>
+    <div id="add-book">
+      <form action="get">
+        <div class="form-wrapper">
+          <div class="form-element">
+            <label for="title">Title:</label>
+            <input type="text" name="title" id="title" required>
+          </div>
+          <div class="form-element">
+            <label for="author">Author:</label>
+            <input type="text" name="author" id="author" required>
+          </div>
+          <div class="form-element">
+            <label for="year">Release year:</label>
+            <input type="tel" name="year" id="year" required>
+          </div>
+          <div class="form-element">
+            <label for="pages">Number of pages:</label>
+            <input type="tel" name="pages" id="pages" required>
+          </div>
+          <div class="form-element">
+            <label for="publisher">Publisher:</label>
+            <input type="text" name="publisher" id="publisher">
+          </div>
+          <div class="form-element">
+            <label for="series">Part of series (optional):</label>
+            <input type="text" name="series" id="series">
+          </div>
+          <div class="form-element">
+            <label for="volume">Volume of series (optional):</label>
+            <input type="tel" name="volume" id="volume">
+          </div>
+          <div class="form-element">
+            <label for="cover">URL for book cover:</label>
+            <input type="url" name="cover" id="cover" required>
+          </div>
+          <button type="submit" id="submit">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="./script.js"></script>
+</body>
+</html>
