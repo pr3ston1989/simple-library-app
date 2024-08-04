@@ -22,6 +22,7 @@ Book.prototype.bookSummary = function() {
 
 const cards = document.getElementById("grid");
 
+
 function addBookToLibrary(book) {
     const bookCard = document.createElement("div");
     bookCard.classList.add("book-card");
@@ -35,6 +36,13 @@ function addBookToLibrary(book) {
     let img = document.createElement("img");
     img.src = book.cover;
     bookCardFront.appendChild(img);
+    const readStatus = document.createElement("h2");
+    if (book.read === false) {
+        readStatus.textContent = "NOT READ";
+    } else {
+        readStatus.textContent = "READ";
+    };
+    bookCardFront.appendChild(readStatus);
     const title = document.createElement("p");
     title.textContent = `Tytuł: ${book.title}`;
     bookCardBack.appendChild(title);
@@ -55,6 +63,8 @@ function addBookToLibrary(book) {
         series.textContent = `Cykl: ${book.series} (tom ${book.volume})`;
         bookCardBack.appendChild(series);
     }
+    const buttonsDiv = document.createElement("div");
+    buttonsDiv.classList.add("buttons-container")
     const remove = document.createElement("button");
     remove.id = book.id;
     remove.textContent = "DELETE BOOK";
@@ -64,19 +74,34 @@ function addBookToLibrary(book) {
     });
     const toggleRead = document.createElement("button");
     toggleRead.classList.add(book.id);
-    toggleRead.textContent = "Read / Not read";
-    bookCardBack.appendChild(remove);
-    bookCardBack.appendChild(toggleRead);
+    if (book.read === false) {
+        toggleRead.textContent = "READ";
+    } else {
+        toggleRead.textContent = "NOT READ";
+    };
+    toggleRead.addEventListener('click', function(event) {
+        event.preventDefault();
+        toggleRead.textContent = (toggleRead.textContent == 'READ') ? "NOT READ" : "READ";
+        changeReadStatus(book, readStatus);
+    });
+    buttonsDiv.appendChild(remove);
+    buttonsDiv.appendChild(toggleRead);
+    bookCardBack.appendChild(buttonsDiv);
     bookCard.appendChild(bookCardFront);
     bookCard.appendChild(bookCardBack);
     cards.appendChild(bookCard);
 }
 
+function changeReadStatus(book, h2) {
+    book.read = (book.read === false) ? true : false;
+    h2.textContent = (book.read === false) ? "NOT READ" : "READ";
+}
+
 function createInitialLibrary() {
-    const halny = new Book("Halny", "Remigiusz Mróz", 2020, 480, "Filia", "Komisarz Forst", 6, "./img/halny.webp", false);
+    const halny = new Book("Halny", "Remigiusz Mróz", 2020, 480, "Filia", "Komisarz Forst", 6, "./img/halny.webp", true);
     const emigracja = new Book("Emigracja", "Malcolm XD", 2019, 240, "W.A.B.", undefined, undefined, "./img/emigracja.webp", false);
     const malowanyCzlowiek = new Book("Malowany człowiek", "Peter V. Brett", 2008, 800, "Fabryka Słów", "Cykl Demoniczny", 1, "./img/malowany.webp", false);
-    const glebiaSkokowiec = new Book("Głębia. Skokowiec", "Marcin Podlewski", 2015, 720, "Fabryka Słów", "Głębia", 1, "./img/glebia.jpg", false);
+    const glebiaSkokowiec = new Book("Głębia. Skokowiec", "Marcin Podlewski", 2015, 720, "Fabryka Słów", "Głębia", 1, "./img/glebia.jpg", true);
     const behawiorysta = new Book("Behawiorysta", "Remigiusz Mróz", 2016, 496, "Filia", "Gerard Edling", 1, "./img/behawiorysta.webp", false);
     const iluzjonista = new Book("Iluzjonista", "Remigiusz Mróz", 2019, 528, "Filia", "Gerard Edling", 2, "./img/iluzjonista.webp", false);
 
@@ -108,12 +133,17 @@ addBookBtn.addEventListener('click', () => {
 const submitBtn = document.getElementById("submit");
 submitBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    const form = document.getElementById("form");
     const inputs = document.getElementsByTagName("input");
     console.log(inputs);
     const inputsData = [];
-    for (input of inputs) {
-        inputsData.push(input.value); 
+    for (let i = 0; i < 8; i++) {
+        inputsData.push(inputs[i].value); 
     }
-    const newBook = new Book(inputsData[0], inputsData[1], inputsData[2], inputsData[3], inputsData[4], inputsData[5], inputsData[6], inputsData[7], false);
+    const readStatusRadio = (document.querySelector("input[type='radio']:checked").value === 'yes') ? true : false;
+    console.log(readStatusRadio); 
+    const newBook = new Book(inputsData[0], inputsData[1], inputsData[2], inputsData[3], inputsData[4], inputsData[5], inputsData[6], inputsData[7], readStatusRadio);
     addBookToLibrary(newBook);
+    form.reset();
+    addBookForm.style.display = 'none';
 })

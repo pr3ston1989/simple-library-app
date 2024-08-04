@@ -14,7 +14,7 @@
   <div class="new-book">
     <button type="button" id="add">Want to add another book?</button>
     <div id="add-book">
-      <form action="get">
+      <form action="get" id="form">
         <div class="form-wrapper">
           <div class="form-element">
             <label for="title">Title:</label>
@@ -47,6 +47,15 @@
           <div class="form-element">
             <label for="cover">URL for book cover:</label>
             <input type="url" name="cover" id="cover" required>
+          </div>
+          <div class="for-element">
+            <fieldset>
+              <legend>Did you read that book?</legend>
+              <label for="yes">Yes</label>
+              <input type="radio" id="yes" name="read-status" value="yes">
+              <label for="no">No</label>
+              <input type="radio" id="no" name="read-status" value="no">
+            </fieldset>
           </div>
           <button type="submit" id="submit">Add</button>
         </div>
