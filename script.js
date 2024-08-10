@@ -1,149 +1,167 @@
-let myLibrary = [];
+class Library {
+    constructor() {
+        this.bookList = [];
+    }
 
-function Book(title, author, year, pages, publisher, series, volume, cover, read) {
-    this.title = title;
-    this.author = author;
-    this.year = year;
-    this.pages = pages;
-    this.publisher = publisher;
-    this.series = series;
-    this.volume = volume;
-    this.cover = cover;
-    this.read = read;
-    this.id = (author+title).split(" ").join("").toLowerCase();
-}
+    addBook(book) {
+        this.bookList.push(book);
+        return book;
+    }
 
-Book.prototype.bookSummary = function() {
-    console.log(`Book "${this.title}" was written by ${this.author} and released by ${this.publisher}.`)
-    if (this.series != undefined) {
-        console.log(`It's volume #${this.volume} of series "${this.series}".`);
+    removeBook(book) {
+        this.bookList = this.bookList.filter(bookInLibrary => bookInLibrary.id != book.id);
+        return book;
+    }
+
+    getLibrary() {
+        return this.bookList;
     }
 }
 
-const cards = document.getElementById("grid");
+class Book {
+    constructor(title, author, year, pages, publisher, series, volume, cover, read) {
+        this.title = title;
+        this.author = author;
+        this.year = year;
+        this.pages = pages;
+        this.publisher = publisher;
+        this.series = series;
+        this.volume = volume;
+        this.cover = cover;
+        this.read = read;
+        this.id = (author+title).split(" ").join("").toLowerCase();
+    }
+
+    bookSummary() {
+        console.log(`Book "${this.title}" was written by ${this.author} and released by ${this.publisher}.`)
+        if (this.series != undefined) {
+            console.log(`It's volume #${this.volume} of series "${this.series}".`);
+        }
+    }
+
+    changeReadStatus() {
+        this.read = (this.read === false) ? true : false;
+    }
+}
+
+class Display {
+    
+
+    constructor(book, library) {
+        this.cards = document.getElementById("grid");
+        this.bookCard = document.createElement("div");
+        this.bookCard.classList.add("book-card");
+        this.bookCard.id = book.id;
+        this.bookCardFront = document.createElement("div");
+        this.bookCardFront.classList.add("content");
+        this.bookCardFront.classList.add("book-card-front");
+        this.bookCardBack = document.createElement("div");
+        this.bookCardBack.classList.add("content");
+        this.bookCardBack.classList.add("book-card-back");
+        this.img = document.createElement("img");
+        this.img.src = book.cover;
+        this.bookCardFront.appendChild(this.img);
+        this.readStatus = document.createElement("h2");
+        if (book.read === false) {
+            this.readStatus.textContent = "NOT READ";
+        } else {
+            this.readStatus.textContent = "READ";
+        };
+        this.bookCardFront.appendChild(this.readStatus);
+        this.title = document.createElement("p");
+        this.title.textContent = `Title: ${book.title}`;
+        this.bookCardBack.appendChild(this.title);
+        this.author = document.createElement("p");
+        this.author.textContent = `Author: ${book.author}`;
+        this.bookCardBack.appendChild(this.author);
+        this.year = document.createElement("p");
+        this.year.textContent = `Release year: ${book.year}`;
+        this.bookCardBack.appendChild(this.year);
+        this.pages = document.createElement("p");
+        this.pages.textContent = `Number of pages: ${book.pages}`;
+        this.bookCardBack.appendChild(this.pages);
+        this.publisher = document.createElement("p");
+        this.publisher.textContent = `Published by: ${book.publisher}`;
+        this.bookCardBack.appendChild(this.publisher);
+        if (book.series !== undefined && book.volume !== undefined) {
+            this.series = document.createElement("p");
+            this.series.textContent = `Series: ${book.series} (Volume ${book.volume})`;
+            this.bookCardBack.appendChild(this.series);
+        }
+        this.buttonsDiv = document.createElement("div");
+        this.buttonsDiv.classList.add("buttons-container")
+        this.remove = document.createElement("button");
+        this.remove.id = book.id;
+        this.remove.textContent = "DELETE BOOK";
+        this.remove.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.removeCard();
+            library.removeBook(book);
+        });
+        this.toggleRead = document.createElement("button");
+        this.toggleRead.classList.add(book.id);
+        if (book.read === false) {
+            this.toggleRead.textContent = "READ";
+        } else {
+            this.toggleRead.textContent = "NOT READ";
+        };
+        this.toggleRead.addEventListener('click', (event) => {
+            event.preventDefault();
+            book.changeReadStatus();
+            this.toggleRead.textContent = (this.toggleRead.textContent == 'READ') ? "NOT READ" : "READ";
+            this.readStatus.textContent = (book.read === true) ? "READ" : "NOT READ";
+        });
+        this.buttonsDiv.appendChild(this.remove);
+        this.buttonsDiv.appendChild(this.toggleRead);
+        this.bookCardBack.appendChild(this.buttonsDiv);
+        this.bookCard.appendChild(this.bookCardFront);
+        this.bookCard.appendChild(this.bookCardBack);
+        this.cards.appendChild(this.bookCard);
+    }
+
+    removeCard() {
+        const divGrid = document.getElementById("grid");
+        divGrid.removeChild(this.bookCard);
+    }
+}
 
 
-function addBookToLibrary(book) {
-    const bookCard = document.createElement("div");
-    bookCard.classList.add("book-card");
-    bookCard.id = book.id;
-    const bookCardFront = document.createElement("div");
-    bookCardFront.classList.add("content");
-    bookCardFront.classList.add("book-card-front");
-    const bookCardBack = document.createElement("div");
-    bookCardBack.classList.add("content");
-    bookCardBack.classList.add("book-card-back");
-    let img = document.createElement("img");
-    img.src = book.cover;
-    bookCardFront.appendChild(img);
-    const readStatus = document.createElement("h2");
-    if (book.read === false) {
-        readStatus.textContent = "NOT READ";
-    } else {
-        readStatus.textContent = "READ";
+
+
+(() => {
+    const myLibrary = new Library();
+    myLibrary.addBook(new Book("Halny", "Remigiusz Mróz", 2020, 480, "Filia", "Komisarz Forst", 6, "./img/halny.webp", true));
+    myLibrary.addBook(new Book("Emigracja", "Malcolm XD", 2019, 240, "W.A.B.", undefined, undefined, "./img/emigracja.webp", false));
+    myLibrary.addBook(new Book("Malowany człowiek", "Peter V. Brett", 2008, 800, "Fabryka Słów", "Cykl Demoniczny", 1, "./img/malowany.webp", false));
+    myLibrary.addBook(new Book("Głębia. Skokowiec", "Marcin Podlewski", 2015, 720, "Fabryka Słów", "Głębia", 1, "./img/glebia.jpg", true));
+    myLibrary.addBook(new Book("Behawiorysta", "Remigiusz Mróz", 2016, 496, "Filia", "Gerard Edling", 1, "./img/behawiorysta.webp", false));
+    myLibrary.addBook(new Book("Iluzjonista", "Remigiusz Mróz", 2019, 528, "Filia", "Gerard Edling", 2, "./img/iluzjonista.webp", false));
+
+    for (book of myLibrary.getLibrary()) {
+        new Display(book, myLibrary);
     };
-    bookCardFront.appendChild(readStatus);
-    const title = document.createElement("p");
-    title.textContent = `Tytuł: ${book.title}`;
-    bookCardBack.appendChild(title);
-    const author = document.createElement("p");
-    author.textContent = `Autor: ${book.author}`;
-    bookCardBack.appendChild(author);
-    const year = document.createElement("p");
-    year.textContent = `Rok wydania: ${book.year}`;
-    bookCardBack.appendChild(year);
-    const pages = document.createElement("p");
-    pages.textContent = `Ilość stron: ${book.pages}`;
-    bookCardBack.appendChild(pages);
-    const publisher = document.createElement("p");
-    publisher.textContent = `Wydawnictwo: ${book.publisher}`;
-    bookCardBack.appendChild(publisher);
-    if (book.series !== undefined && book.volume !== undefined) {
-        const series = document.createElement("p");
-        series.textContent = `Cykl: ${book.series} (tom ${book.volume})`;
-        bookCardBack.appendChild(series);
-    }
-    const buttonsDiv = document.createElement("div");
-    buttonsDiv.classList.add("buttons-container")
-    const remove = document.createElement("button");
-    remove.id = book.id;
-    remove.textContent = "DELETE BOOK";
-    remove.addEventListener('click', function(event) {
+
+    const addBookBtn = document.getElementById("add");
+    const addBookForm = document.getElementById("add-book");
+    const submitBtn = document.getElementById("submit");
+    addBookBtn.addEventListener('click', () => {
+        addBookForm.style.display = 'block';
+    })
+    submitBtn.addEventListener('click', (event) => {
         event.preventDefault();
-        removeFromLibrary(String(book.id));
-    });
-    const toggleRead = document.createElement("button");
-    toggleRead.classList.add(book.id);
-    if (book.read === false) {
-        toggleRead.textContent = "READ";
-    } else {
-        toggleRead.textContent = "NOT READ";
-    };
-    toggleRead.addEventListener('click', function(event) {
-        event.preventDefault();
-        toggleRead.textContent = (toggleRead.textContent == 'READ') ? "NOT READ" : "READ";
-        changeReadStatus(book, readStatus);
-    });
-    buttonsDiv.appendChild(remove);
-    buttonsDiv.appendChild(toggleRead);
-    bookCardBack.appendChild(buttonsDiv);
-    bookCard.appendChild(bookCardFront);
-    bookCard.appendChild(bookCardBack);
-    cards.appendChild(bookCard);
-}
-
-function changeReadStatus(book, h2) {
-    book.read = (book.read === false) ? true : false;
-    h2.textContent = (book.read === false) ? "NOT READ" : "READ";
-}
-
-function createInitialLibrary() {
-    const halny = new Book("Halny", "Remigiusz Mróz", 2020, 480, "Filia", "Komisarz Forst", 6, "./img/halny.webp", true);
-    const emigracja = new Book("Emigracja", "Malcolm XD", 2019, 240, "W.A.B.", undefined, undefined, "./img/emigracja.webp", false);
-    const malowanyCzlowiek = new Book("Malowany człowiek", "Peter V. Brett", 2008, 800, "Fabryka Słów", "Cykl Demoniczny", 1, "./img/malowany.webp", false);
-    const glebiaSkokowiec = new Book("Głębia. Skokowiec", "Marcin Podlewski", 2015, 720, "Fabryka Słów", "Głębia", 1, "./img/glebia.jpg", true);
-    const behawiorysta = new Book("Behawiorysta", "Remigiusz Mróz", 2016, 496, "Filia", "Gerard Edling", 1, "./img/behawiorysta.webp", false);
-    const iluzjonista = new Book("Iluzjonista", "Remigiusz Mróz", 2019, 528, "Filia", "Gerard Edling", 2, "./img/iluzjonista.webp", false);
-
-    myLibrary.push(halny, emigracja, malowanyCzlowiek, glebiaSkokowiec, behawiorysta, iluzjonista);
-
-    for (book of myLibrary) {
-        addBookToLibrary(book);
-    };
-}
-
-createInitialLibrary();
-
-function removeFromLibrary(bookId) {
-    myLibrary = myLibrary.filter(book => book.id != bookId);
-    console.dir(myLibrary);
-    const divGrid = document.getElementById("grid");
-    const divCard = document.getElementById(bookId);
-    divGrid.removeChild(divCard);
-};
-
-
-
-const addBookBtn = document.getElementById("add");
-const addBookForm = document.getElementById("add-book");
-addBookBtn.addEventListener('click', () => {
-    addBookForm.style.display = 'block';
-})
-
-const submitBtn = document.getElementById("submit");
-submitBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    const form = document.getElementById("form");
-    const inputs = document.getElementsByTagName("input");
-    console.log(inputs);
-    const inputsData = [];
-    for (let i = 0; i < 8; i++) {
-        inputsData.push(inputs[i].value); 
-    }
-    const readStatusRadio = (document.querySelector("input[type='radio']:checked").value === 'yes') ? true : false;
-    console.log(readStatusRadio); 
-    const newBook = new Book(inputsData[0], inputsData[1], inputsData[2], inputsData[3], inputsData[4], inputsData[5], inputsData[6], inputsData[7], readStatusRadio);
-    addBookToLibrary(newBook);
-    form.reset();
-    addBookForm.style.display = 'none';
-})
+        const form = document.getElementById("form");
+        const inputs = document.getElementsByTagName("input");
+        const inputsData = [];
+        for (let i = 0; i < 8; i++) {
+            inputsData.push(inputs[i].value); 
+        }
+        const readStatusRadio = (document.querySelector("input[type='radio']:checked").value === 'yes') ? true : false;
+        const newBook = myLibrary.addBook(new Book(
+            inputsData[0], inputsData[1], inputsData[2], inputsData[3],
+            inputsData[4], inputsData[5], inputsData[6], inputsData[7],
+            readStatusRadio));
+        new Display(newBook);
+        form.reset();
+        addBookForm.style.display = 'none';
+    })
+})();
